@@ -4,5 +4,5 @@
 | Done | Problema | Descrição |
 | ------ | ------ | ------ |
 | No | C | Escalonamento por EDF |
-| No | D | O Cliente ´e um Chato |
+| No | D | O Cliente é um Chato |
 
