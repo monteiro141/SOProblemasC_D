@@ -1,9 +1,9 @@
 gcc -Wall -lm PC.c
-a.out <input.txt > oo1
-a.out <input2.txt > oo2
-a.out <input3.txt > oo3
-a.out <input4.txt > oo4
-a.out <input5.txt > oo5
+./a.out <input.txt > oo1
+./a.out <input2.txt > oo2
+./a.out <input3.txt > oo3
+./a.out <input4.txt > oo4
+./a.out <input5.txt > oo5
 
 diff oo1 so1 > dif1
 diff oo2 so2 > dif2
