@@ -3,6 +3,6 @@
 
 | Done | Problema | Descrição |
 | ------ | ------ | ------ |
-| No | C | Escalonamento por EDF |
+| Yes | C | Escalonamento por EDF |
 | No | D | O Cliente é um Chato |
 
