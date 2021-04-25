@@ -1,4 +1,4 @@
-gcc PC.c
+gcc -Wall -lm PC.c
 a.out <input.txt > oo1
 a.out <input2.txt > oo2
 a.out <input3.txt > oo3

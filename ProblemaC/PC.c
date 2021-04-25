@@ -22,7 +22,7 @@ typedef struct
 }INSTANCIAS;
 int numInstancias;
 int numProcessos;
-
+int processoAnterior;
 void comecarInstancias(INSTANCIAS I[][200],BLOCO processos[numProcessos])
 {
     int i;
@@ -86,10 +86,59 @@ int compararProcessos(BLOCO processos[numProcessos])
             menor = processos[i].tempoExecucaoRestante;
             indiceMenor = i;
         }*/
-        if(menor==0 || (processos[indiceMenor].periodoRestante >= processos[i].periodoRestante && processos[i].tempoExecucaoRestante >0))
+        if(menor==0)
         {
             menor = processos[i].tempoExecucaoRestante;
             indiceMenor = i;
+        }else
+        if(processos[indiceMenor].periodoRestante >= processos[i].periodoRestante && processos[i].tempoExecucaoRestante >0)
+        {
+            if(processos[indiceMenor].periodoRestante == processos[i].periodoRestante)
+            {
+                if(processoAnterior == -1)
+                {
+                    if(processos[indiceMenor].periodo - processos[indiceMenor].periodoRestante > processos[i].periodo - processos[i].periodoRestante )
+                    {
+                        //printf("<= \n");
+                        menor = processos[indiceMenor].tempoExecucaoRestante;
+                        indiceMenor = indiceMenor;
+                    }else
+                    {
+                        //printf("> \n");
+                        menor = processos[i].tempoExecucaoRestante;
+                        indiceMenor = i;
+                    }
+                }else
+                {
+                    if(indiceMenor == processoAnterior)
+                    {
+                        //printf("== \n");
+                        menor = processos[indiceMenor].tempoExecucaoRestante;
+                        indiceMenor = indiceMenor;
+                    }else if (i == processoAnterior)
+                    {
+                        //printf(">> \n");
+                        menor = processos[i].tempoExecucaoRestante;
+                        indiceMenor = i;
+                    }else
+                    {
+                       if(processos[indiceMenor].periodo - processos[indiceMenor].periodoRestante > processos[i].periodo - processos[i].periodoRestante )
+                        {
+                            //printf("<= \n");
+                            menor = processos[indiceMenor].tempoExecucaoRestante;
+                            indiceMenor = indiceMenor;
+                        }else
+                        {
+                            //printf("> \n");
+                            menor = processos[i].tempoExecucaoRestante;
+                            indiceMenor = i;
+                        } 
+                    }
+                }
+            }else{
+                menor = processos[i].tempoExecucaoRestante;
+                indiceMenor = i;
+            }
         }
     }
     if(menor == 0)
@@ -100,6 +149,7 @@ int compararProcessos(BLOCO processos[numProcessos])
 int main(){
     int i,tempoTotal,u;
     float Carga=0;
+    processoAnterior = -1;
     scanf("%d\n", &numProcessos);
     BLOCO processos[numProcessos];
     INSTANCIAS I[200];
@@ -128,7 +178,6 @@ int main(){
             printf("i: %d vs processo %c vs tempR %d vs perR %d\n",i,processos[0].NomeProcesso,processos[0].tempoExecucaoRestante,processos[0].periodoRestante);
             printf("i: %d vs processo %c vs tempR %d vs perR %d\n",i,processos[1].NomeProcesso,processos[1].tempoExecucaoRestante,processos[1].periodoRestante);
             printf("i: %d vs processo %c vs tempR %d vs perR %d\n",i,processos[2].NomeProcesso,processos[2].tempoExecucaoRestante,processos[2].periodoRestante);
-
         }*/
         char instancia[5];
         //Resetar os tempos
@@ -136,17 +185,13 @@ int main(){
         //Comparar qual dos processos deve fazer
         indiceAtual = compararProcessos(processos);
         //printf("IND a: %d\n",indiceAtual);
-        for(u=0;u<numProcessos;u++)
-        {
-            if(processos[u].periodoRestante > 0)
-                processos[u].periodoRestante--;    
-        }
         if(indiceAtual ==-1)
         {
             printf("T=%d IDLE\n",i);
         }else
         {
             //verificarInstancias(&I,processos[indiceAtual].NomeProcesso);
+            processoAnterior = indiceAtual;
             if(processos[indiceAtual].tempoExecucaoRestante>0)
                 processos[indiceAtual].tempoExecucaoRestante--;
             sprintf(instancia,"%c-%d",processos[indiceAtual].NomeProcesso,processos[indiceAtual].numeroInstancia);
@@ -158,8 +203,12 @@ int main(){
             printf("i: %d vs processo %c vs tempR %d vs perR %d\n",i,processos[0].NomeProcesso,processos[0].tempoExecucaoRestante,processos[0].periodoRestante);
             printf("i: %d vs processo %c vs tempR %d vs perR %d\n",i,processos[1].NomeProcesso,processos[1].tempoExecucaoRestante,processos[1].periodoRestante);
             printf("i: %d vs processo %c vs tempR %d vs perR %d\n",i,processos[2].NomeProcesso,processos[2].tempoExecucaoRestante,processos[2].periodoRestante);
-
         }*/
+        for(u=0;u<numProcessos;u++)
+        {
+            if(processos[u].periodoRestante > 0)
+                processos[u].periodoRestante--;    
+        }
         for(u=0;u<numProcessos;u++)
         {
             if(processos[u].periodoRestante == 0 && processos[u].tempoExecucaoRestante >0)
