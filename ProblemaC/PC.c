@@ -13,13 +13,15 @@ typedef struct{
     int periodo;//5
     int tempoExecucaoRestante;
     int periodoRestante;
+    int instanciado;
 }BLOCO;
 
 typedef struct
 {
     int PID;
-    char instancia[200];
+    char instancia[5];
 }INSTANCIAS;
+
 int numInstancias;
 int numProcessos;
 int processoAnterior;
@@ -34,33 +36,37 @@ void comecarInstancias(INSTANCIAS I[][200],BLOCO processos[numProcessos])
     }
 }
 
-int verificarInstancias(INSTANCIAS I[][200],char instanciaAtual[5])
+void criarInstancias(INSTANCIAS I[][200],char instanciaAtual[5])
 {
     int existe=0,i;
-    for(i=0; i < numInstancias;i++)
+    for(i=0;i<numInstancias;i++)
     {
         if(strcmp((*I)[i].instancia,instanciaAtual)==0)
         {
-            return i;
+            existe=1;
         }
     }
-    if(existe==0 && numInstancias !=0)
+    if(existe==0)
     {
-        (*I)[numInstancias].PID = (*I)[numInstancias-1].PID +1;
-        strcpy((*I)[numInstancias].instancia,instanciaAtual);
         numInstancias++;
-    }else if (existe==0 && numInstancias ==0)
-    {
-        (*I)[numInstancias].PID = 0;
-        strcpy((*I)[numInstancias].instancia,instanciaAtual);
-        numInstancias++;
+        strcpy((*I)[numInstancias-1].instancia,instanciaAtual);
+        (*I)[numInstancias-1].PID = (*I)[numInstancias-2].PID + 1; 
     }
-    return numInstancias-1;
 }
-
-void resetar(BLOCO processos[][numProcessos],int tempoAtual)
+int devolverPID(INSTANCIAS I[200],char instanciaAtual[5])
 {
     int i;
+    for(i=0;i<numInstancias;i++)
+    {
+        if(strcmp(I[i].instancia,instanciaAtual)==0)
+            return i;
+    }
+    return -1;
+}
+void resetar(BLOCO processos[][numProcessos],int tempoAtual, INSTANCIAS I[][200])
+{
+    int i;
+    char instancia[5];
     for(i=0;i<numProcessos;i++)
     {
         if((*processos)[i].periodoRestante==0 && (*processos)[i].tempoExecucaoRestante==0 && (tempoAtual) !=0)
@@ -68,6 +74,17 @@ void resetar(BLOCO processos[][numProcessos],int tempoAtual)
             (*processos)[i].numeroInstancia++;
             (*processos)[i].tempoExecucaoRestante = (*processos)[i].tempoExecucao;
             (*processos)[i].periodoRestante = (*processos)[i].periodo;
+            if((*processos)[i].instanciado==0)
+            {
+                sprintf(instancia,"%c-%d",(*processos)[i].NomeProcesso,(*processos)[i].numeroInstancia);
+                criarInstancias(I,instancia);
+            }
+            (*processos)[i].instanciado=0;
+        }else if((*processos)[i].periodoRestante==0 && (*processos)[i].tempoExecucaoRestante > 0 && (tempoAtual) !=0)
+        {
+            (*processos)[i].instanciado=1;
+            sprintf(instancia,"%c-%d",(*processos)[i].NomeProcesso,(*processos)[i].numeroInstancia+1);
+            criarInstancias(I,instancia);
         }
     }
 }
@@ -162,6 +179,7 @@ int main(){
         processos[i].tempoExecucaoRestante = processos[i].tempoExecucao;
         processos[i].periodoRestante = processos[i].periodo;
         processos[i].PID=i;
+        processos[i].instanciado=0;
         Carga += ((float)processos[i].tempoExecucao/(float)processos[i].periodo);
     }
     printf("CARGA=%4.3f\n", Carga);
@@ -181,7 +199,7 @@ int main(){
         }*/
         char instancia[5];
         //Resetar os tempos
-        resetar(&processos,i);
+        resetar(&processos,i,&I);
         //Comparar qual dos processos deve fazer
         indiceAtual = compararProcessos(processos);
         //printf("IND a: %d\n",indiceAtual);
@@ -195,7 +213,7 @@ int main(){
             if(processos[indiceAtual].tempoExecucaoRestante>0)
                 processos[indiceAtual].tempoExecucaoRestante--;
             sprintf(instancia,"%c-%d",processos[indiceAtual].NomeProcesso,processos[indiceAtual].numeroInstancia);
-            printf("T=%d PID=%d CPU=%s\n",i,I[verificarInstancias(&I,instancia)].PID,instancia);
+            printf("T=%d PID=%d CPU=%s\n",i,I[devolverPID(I,instancia)].PID,instancia);
         }
         /*if(i>=0)
         {
