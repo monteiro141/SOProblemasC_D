@@ -1,4 +1,4 @@
-gcc main.c
+gcc -Wall -lm main.c
 a.out < si1 > oo1
 a.out < si2 > oo2
 a.out < si3 > oo3
